@@ -23,9 +23,9 @@ VIDEO_FPS = ANIMATION_FPS / 4
 EXTRA_FRAMES = 400
 
 # Folder paths
-IMAGES_FOLDER = "./images"
-FRAMES_FOLDER = "./frames"
-RESULTS_FOLDER = "./results"
-VIDEOS_FOLDER = r"C:\Users\urizi\Documents\GitHub\RoboticWeaver\videos"
-WEBSITE_FOLDER = "./website"
-ROBOT_FOLDER = "./robot"
+IMAGES_FOLDER = "algorithm/images"
+FRAMES_FOLDER = "algorithm/frames"
+RESULTS_FOLDER = "algorithm/results"
+VIDEOS_FOLDER = "algorithm/videos"
+WEBSITE_FOLDER = "algorithm/website"
+ROBOT_FOLDER = "algorithm/robot"

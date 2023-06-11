@@ -5,6 +5,9 @@ import fs from "fs";
 const { spawn } = require('node:child_process');
 const cloudinary = require('cloudinary').v2;
 
+const NAILS_PATH = "./algorithm/frames/nails_polygon.jpg";
+const MAIN_PATH = './algorithm/main.py'
+
 // Configuration 
 cloudinary.config({
     cloud_name: process.env.CLOUD_NAME,
@@ -37,11 +40,12 @@ const readFile = (req) => {
 
 function runWeaver(image_path, output_name, callback) {
     console.log("starting the weaver...")
-    const nails_path = "../../frames/nails_polygon.jpg";
-    const python = spawn('python', ['../../main.py', image_path, nails_path, output_name, '-v']);
+
+    const python = spawn('python', [MAIN_PATH, image_path, NAILS_PATH, output_name, '-v']);
     console.log("weaving...")
     python.stdout.on('data', function (data) {
         console.log("...")
+        // console.log(data.toString())
     });
     python.stderr.on('data', (data) => {
         console.error(`stderr: ${data}`);
@@ -70,7 +74,7 @@ const handler = async (req, res) => {
     runWeaver(imageFile.filepath, imageFile.originalFilename,
         async () => {
             try {
-                const videoPath = `../../videos/${imageFile.originalFilename}.mp4`
+                const videoPath = `algorithm/videos/${imageFile.originalFilename}.mp4`
                 //upload to cloudinary
                 const response = await cloudinary.uploader.upload(videoPath, {
                     resource_type: 'video',
