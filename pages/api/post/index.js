@@ -24,7 +24,7 @@ export const config = {
 
 const readFile = (req) => {
     const options = {};
-    options.uploadDir = path.join(process.cwd(), "/public/images");
+    options.uploadDir = path.join(process.cwd(), "/images");
     options.filename = (name, ext, path, form) => {
         return Date.now().toString() + "_" + path.originalFilename;
     };
