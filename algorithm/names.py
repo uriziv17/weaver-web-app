@@ -15,7 +15,7 @@ RGB_WHITE = (255, 255, 255)  # pygame works with 3 color channels
 
 # Globals
 INTENSITY = 0.15
-TARGET_BRIGHTNESS = int(0.95 * WHITE)
+TARGET_BRIGHTNESS = int(0.90 * WHITE)
 OPT_RES = 400
 FONT_SIZE = 6
 ANIMATION_FPS = 1_000
