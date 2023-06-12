@@ -24,7 +24,7 @@ export const config = {
 
 const readFile = (req) => {
     const options = {};
-    options.uploadDir = path.join(process.cwd(), "/images");
+    options.uploadDir = path.join(process.cwd(), "/tmp/images");
     options.filename = (name, ext, path, form) => {
         return Date.now().toString() + "_" + path.originalFilename;
     };
@@ -74,7 +74,7 @@ const handler = async (req, res) => {
     runWeaver(imageFile.filepath, imageFile.originalFilename,
         async () => {
             try {
-                const videoPath = `algorithm/videos/${imageFile.originalFilename}.mp4`
+                const videoPath = `tmp/videos/${imageFile.originalFilename}.mp4`
                 //upload to cloudinary
                 const response = await cloudinary.uploader.upload(videoPath, {
                     resource_type: 'video',

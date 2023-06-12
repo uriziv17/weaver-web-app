@@ -23,9 +23,9 @@ VIDEO_FPS = ANIMATION_FPS / 4
 EXTRA_FRAMES = 400
 
 # Folder paths
-IMAGES_FOLDER = "algorithm/images"
-FRAMES_FOLDER = "algorithm/frames"
-RESULTS_FOLDER = "algorithm/results"
-VIDEOS_FOLDER = "algorithm/videos"
-WEBSITE_FOLDER = "algorithm/website"
-ROBOT_FOLDER = "algorithm/robot"
+IMAGES_FOLDER = "tmp/images"
+FRAMES_FOLDER = "tmp/frames"
+RESULTS_FOLDER = "tmp/results"
+VIDEOS_FOLDER = "tmp/videos"
+WEBSITE_FOLDER = "tmp/website"
+ROBOT_FOLDER = "tmp/robot"
