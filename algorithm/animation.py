@@ -21,7 +21,8 @@ class Animator:
         self.nails = nails
         self.shape = (shape[1], shape[0])
         self.line_color = (0, 0, 0, 255 * intensity)
-        self.screen = pygame.display.set_mode((480, 400))
+        # self.screen = pygame.display.set_mode((480, 400))
+        self.screen = pygame.Surface((480, 400))
         self.fps = fps
         print(f"screen is at {self.screen.get_size()}")
 
@@ -41,9 +42,11 @@ class Animator:
                 end_pos = (self.weaving[index + 1][1], self.weaving[index + 1][0])
                 pygame.draw.line(surf, self.line_color, start_pos, end_pos)
                 self.screen.blit(surf, (0, 0))
-                pygame.display.flip()
+                # pygame.display.flip()
                 if make_video:
-                    filename = os.path.join(VIDEOS_FOLDER, f"{video_name}_frame_{index}.png")
+                    filename = os.path.join(
+                        VIDEOS_FOLDER, f"{video_name}_frame_{index}.png"
+                    )
                     pygame.image.save(self.screen, filename)
                 index += 1
                 # clock.tick(self.fps)
@@ -54,11 +57,14 @@ class Animator:
 
         if make_video:
             n_frames = index
-            image_files = [os.path.join(VIDEOS_FOLDER, f"{video_name}_frame_{frame_number}.png") for frame_number in range(n_frames)]
+            image_files = [
+                os.path.join(VIDEOS_FOLDER, f"{video_name}_frame_{frame_number}.png")
+                for frame_number in range(n_frames)
+            ]
 
             # create MP4 video
-            video_name = os.path.join(VIDEOS_FOLDER, video_name + '.mp4')
-            with imageio.get_writer(video_name, mode='I', fps=VIDEO_FPS) as writer:
+            video_name = os.path.join(VIDEOS_FOLDER, video_name + ".mp4")
+            with imageio.get_writer(video_name, mode="I", fps=VIDEO_FPS) as writer:
                 for image_file in image_files:
                     image = imageio.v2.imread(image_file)
                     writer.append_data(image)

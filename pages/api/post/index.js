@@ -24,7 +24,7 @@ export const config = {
 
 const readFile = (req) => {
     const options = {};
-    options.uploadDir = "/tmp/images";
+    options.uploadDir = path.join(process.cwd(), "/images");
     options.filename = (name, ext, path, form) => {
         return Date.now().toString() + "_" + path.originalFilename;
     };
@@ -57,16 +57,16 @@ function runWeaver(image_path, output_name, callback) {
 }
 
 const handler = async (req, res) => {
-    try {
-        fs.readdir("/tmp/images");
-    } catch (error) {
-        fs.mkdir("/tmp/images", (err) => {
-            if (err) {
-                console.error(err);
-                res.status(500).json({ error: 'Internal server error' });
-            }
-        });
-    }
+    // try {
+    //     fs.readdir("/tmp/images");
+    // } catch (error) {
+    //     fs.mkdir("/tmp/images", (err) => {
+    //         if (err) {
+    //             console.error(err);
+    //             res.status(500).json({ error: 'Internal server error' });
+    //         }
+    //     });
+    // }
     const { fields, files } = await readFile(req, true);
     const imageFile = files.image;
     // console.log(imageFile);
@@ -74,7 +74,7 @@ const handler = async (req, res) => {
     runWeaver(imageFile.filepath, imageFile.originalFilename,
         async () => {
             try {
-                const videoPath = `/tmp/videos/${imageFile.originalFilename}.mp4`
+                const videoPath = path.join(process.cwd(), `/algorithm/videos/${imageFile.originalFilename}.mp4`)
                 //upload to cloudinary
                 const response = await cloudinary.uploader.upload(videoPath, {
                     resource_type: 'video',
