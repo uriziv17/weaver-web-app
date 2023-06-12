@@ -1,3 +1,4 @@
+import os
 import matplotlib.pyplot as plt
 from skimage.io import imread
 from skimage.filters import gaussian
@@ -50,13 +51,15 @@ def main():
     image = read_image(image_path)
     board = read_image(board_path)
     loom = Loom(image, board)
-    nails_sequence = loom.weave()
+    nails_sequence = loom.weave(
+        video_path=os.path.join(VIDEOS_FOLDER, name + ".avi") if make_video else None
+    )
     # write_nails_to_file(nail_sequence, image_path + "_sequence.ssc", len(image))
     save_image(loom.canvas, RESULTS_FOLDER + "/" + name + "_weave.png")
-    if make_video:
-        # anim = Animator(nails_sequence, loom.canvas.shape, loom.nails)
-        anim = CanvasAnimator(nails_sequence, loom.canvas.shape, loom.nails)
-        anim.animate(make_video=True, video_name=name)
+    # if make_video:
+    #     # anim = Animator(nails_sequence, loom.canvas.shape, loom.nails)
+    #     anim = CanvasAnimator(nails_sequence, loom.canvas.shape, loom.nails)
+    #     anim.animate(make_video=True, video_name=name)
     write_nails_to_file(
         nails_sequence, RESULTS_FOLDER + "/" + name + "_sequence.ssc", len(image_path)
     )

@@ -3,6 +3,7 @@ from skimage.feature import blob_log
 from skimage.transform import rescale
 from skimage.util import crop
 import matplotlib.pyplot as plt
+import cv2
 from names import *
 
 
@@ -36,12 +37,18 @@ def adjust_image_dimensions(image: Image, board_shape: tuple[int, int]) -> Image
     """
     image_height, image_width = image.shape
     board_height, board_width = board_shape
-    scale_factor = board_height / image_height if image_height < image_width else board_width / image_width
+    scale_factor = (
+        board_height / image_height
+        if image_height < image_width
+        else board_width / image_width
+    )
     rescaled_image = rescale(image, scale_factor, preserve_range=True)
     image_height, image_width = rescaled_image.shape
     height_crop = (image_height - board_height) // 2
     width_crop = (image_width - board_width) // 2
-    cropped = crop(rescaled_image, ((height_crop, height_crop), (width_crop, width_crop)))
+    cropped = crop(
+        rescaled_image, ((height_crop, height_crop), (width_crop, width_crop))
+    )
     return np.array(cropped.tolist(), dtype=int)
 
 
@@ -78,7 +85,7 @@ def find_nails_locations(board: Image, epsilon=7) -> list[Nail]:
     :param epsilon: the maximum distance for blobs to be counted as the same nail.
     :param board: A grayscale (0-255) image of the nailed board.
     """
-    normalized_negative = 1-(board/WHITE)
+    normalized_negative = 1 - (board / WHITE)
     centers_sigmas = blob_log(normalized_negative)
     nails = [(int(c[0]), int(c[1])) for c in centers_sigmas]
     new_nails = []
@@ -101,13 +108,15 @@ def get_all_possible_strands(nails_locations: list[Nail]) -> dict[Nail, list[Str
     :param nails_locations: Indices of the nails on the image frame.
     :return: A dict mapping from a nail to a list of all his possible strands.
     """
-    return {nail1: [Strand(nail1, nail2)
-                    for nail2 in nails_locations
-                    if nail2 != nail1]
-            for nail1 in nails_locations}
+    return {
+        nail1: [Strand(nail1, nail2) for nail2 in nails_locations if nail2 != nail1]
+        for nail1 in nails_locations
+    }
 
 
-def find_darkest_strand(image: Image, possible_strands: list[Strand]) -> tuple[Strand, float]:
+def find_darkest_strand(
+    image: Image, possible_strands: list[Strand]
+) -> tuple[Strand, float]:
     """
     Finds the strand with the smallest (darkest) mean value in its pixels relative to `image`.
 
@@ -139,7 +148,7 @@ class Loom(object):
         self.intensity = int(np.floor(WHITE * intensity))
         self.initial_mean = np.mean(self.image)
 
-    def weave(self) -> list[Nail]:
+    def weave(self, video_path=None) -> list[Nail]:
         """
         Weaves onto `self.canvas` a strand-approximation of `self.image`.
 
@@ -149,18 +158,37 @@ class Loom(object):
         current_nail = self.nails[0]
         nails_sequence = []
         current_mean = 0
+        video_out = None
+
+        if video_path is not None:
+            fourcc = cv2.VideoWriter_fourcc(*"MJPG")
+            video_out = cv2.VideoWriter(
+                video_path, fourcc, 60, (self.canvas.shape[1], self.canvas.shape[0])
+            )
         while current_mean < TARGET_BRIGHTNESS:
             print(f"iter {counter}")
             # Find the darkest strand relative to `self.image`
             # remove its intensity from `self.canvas` and add its intensity to `self.image`
-            current_strand, current_mean = find_darkest_strand(self.image, self.strands[current_nail])
+            current_strand, current_mean = find_darkest_strand(
+                self.image, self.strands[current_nail]
+            )
             for pixel in current_strand.get_line():
                 self.image[pixel] = min(WHITE, self.image[pixel] + self.intensity)
                 self.canvas[pixel] = max(BLACK, self.canvas[pixel] - self.intensity)
             counter += 1
             # Add the used nail to the nails sequence
             nails_sequence.append(current_nail)
-            current_nail = current_strand.nails[1] if current_strand.nails[1] != current_nail else current_strand.nails[0]
+            current_nail = (
+                current_strand.nails[1]
+                if current_strand.nails[1] != current_nail
+                else current_strand.nails[0]
+            )
+            # video
+            if video_path is not None:
+                video_out.write(self.canvas)
+
+        if video_path is not None:
+            video_out.release()
         return nails_sequence
 
     def reset(self, new_image: Image, new_k: int):
@@ -180,21 +208,25 @@ class Loom(object):
         for num, nail in enumerate(self.nails):
             if nail == location:
                 number = num
-        plt.text(location[1], location[0], str(number + 1), fontsize=FONT_SIZE, color='red')
-        plt.imshow(self.board, cmap='gray')
+        plt.text(
+            location[1], location[0], str(number + 1), fontsize=FONT_SIZE, color="red"
+        )
+        plt.imshow(self.board, cmap="gray")
         plt.show()
 
     def plot_nail_location(self, number):
         location = (-1, -1)
         for num, nail in enumerate(self.nails):
-            if num+1 == number:
+            if num + 1 == number:
                 location = nail
-        plt.text(location[1], location[0], str(number + 1), fontsize=FONT_SIZE, color='red')
-        plt.imshow(self.board, cmap='gray')
+        plt.text(
+            location[1], location[0], str(number + 1), fontsize=FONT_SIZE, color="red"
+        )
+        plt.imshow(self.board, cmap="gray")
         plt.show()
 
     def plot_all_nail_numbers(self):
         for number, nail in enumerate(self.nails):
-            plt.text(nail[1], nail[0], str(number+1), fontsize=FONT_SIZE, color='red')
-        plt.imshow(self.board, cmap='gray')
+            plt.text(nail[1], nail[0], str(number + 1), fontsize=FONT_SIZE, color="red")
+        plt.imshow(self.board, cmap="gray")
         plt.show()
