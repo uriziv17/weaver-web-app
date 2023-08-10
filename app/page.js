@@ -49,19 +49,20 @@ export default function Home() {
           </p>
         </div>
         <div>
-          {loading && (
+          {loading ?
             <div className="spinner">
               <ClipLoader color="#123abc" loading={loading} classNasme='spinner' size={100} />
               <p>please wait - do not refresh the page...</p>
             </div>
-
-          )}
+            :
+            <form onSubmit={submitData}>
+              <input type="file" accept="image/*" onChange={handleImageChange} />
+              <input className="create" disabled={!image} type="submit" value="Create" />
+            </form>
+          }
         </div>
         <div>
-          <form onSubmit={submitData}>
-            <input type="file" accept="image/*" onChange={handleImageChange} />
-            <input className="create" disabled={!image} type="submit" value="Create" />
-          </form>
+
         </div>
         <div>
           {video ? <ReactPlayer url={video} controls={true} /> : <></>}
